@@ -1,0 +1,77 @@
+---
+title: How to echo all code chunks or specific named ones.
+author: |-
+  Shripad Sinari \
+  shripad.sinari@gmail.com \
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    fig_caption: yes
+    keep_tex: yes
+
+---
+
+# Demo
+
+In this demo we create a small mock report based on the mtcars dataset provided
+in R. The goal is show how to use the knitr package to echo specific code chunks
+to display code _at the end of the report_. We will echo a specific code chunk
+which modifies the standard mtcars data frame and then echo _all_ code chunks in
+this report as well.
+
+```{r LoadLib, echo = FALSE, eval = TRUE, message=FALSE, warning=FALSE, results = "hide"}
+
+## Live in tidyverse.
+library(tidyverse)
+## we need this library to make mtcars a tibble.
+library(dplyr)
+## we need this library as it is not part of tidyverse.
+library(knitr) 
+
+```
+
+```{r modify_data, echo = FALSE, eval = TRUE, message=FALSE, warning=FALSE, results = "hide"}
+## Clear any previous data.
+rm(list = ls())
+mtcars <- mtcars %>%
+    rownames_to_column("cars") %>%
+    mutate(make = sub("\\s.*", "", cars)
+         , model = sub("^.*\\s", "", cars)) %>%
+    as_tibble()
+
+```
+
+```{r display, echo = FALSE, eval = TRUE, message=FALSE, warning=FALSE,fig.pos="H", fig.path='plot-', dev='pdf', fig.ext='pdf', fig.width=8, fig.height=6, fig.cap = "Plot to display. End of mock demo."}
+
+mtcars %>%
+    ggplot(aes(mpg, disp)) +
+    geom_point(aes(color = make, shape = factor(gear))) +
+    guides(shape = guide_legend(title = "Gear")
+         , color = guide_legend(title = "Car Company"))
+
+```
+
+
+\clearpage
+
+# Code that modifies the mtcars data frame is displayed.
+
+```{r modify_df, ref.label = all_labels()[grep("modify",all_labels())],echo = TRUE, eval = TRUE, message=FALSE, warning=FALSE, results = "hide"}
+
+```
+
+\clearpage
+
+# All code chunks are displayed in a single view.
+
+```{r allcode, ref.label = all_labels(),echo = TRUE, eval = FALSE, message=FALSE, warning=FALSE, results = "hide"}
+
+```
+
+
+# Reproducibility
+
+```{r ssinfo, echo = FALSE, eval = TRUE, message=FALSE, warning=FALSE, results = "markup"}
+sessionInfo()
+```
+
