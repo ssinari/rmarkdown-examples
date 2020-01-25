@@ -19,14 +19,35 @@ to display code _at the end of the report_. We will echo a specific code chunk
 which modifies the standard mtcars data frame and then echo _all_ code chunks in
 this report as well.
 
+This code chunk echo is achieved by using _ref.label_ option in the code chunk
+and supplying the option with _name_ of the code chunk to be displayed as such.
+
+The `all_labels` function return a character vector of all code chunk names. One
+can then select the code chunk name to be displayed. To display all chunks just
+supply the character vector returned by `all_labels` as value to _ref.label_ as
+such
+
 ```{r LoadLib, echo = FALSE, eval = TRUE, message=FALSE, warning=FALSE, results = "hide"}
 
 ## Live in tidyverse.
 library(tidyverse)
+
 ## we need this library to make mtcars a tibble.
 library(dplyr)
+
 ## we need this library as it is not part of tidyverse.
 library(knitr) 
+
+## The following idea of wrapping code chunk options
+## around the code chunk display is taken from:
+## https://github.com/yihui/knitr-examples/blob/master/062-chunk-wrapper.Rmd
+
+library(knitr)
+knit_hooks$set(wrapper = function(before, options, envir) {
+  if (before) {
+    sprintf('    ```{r %s}\n', options$params.src)
+  } else '    ```\n'
+})
 
 ```
 
@@ -56,7 +77,7 @@ mtcars %>%
 
 # Code that modifies the mtcars data frame is displayed.
 
-```{r modify_df, ref.label = all_labels()[grep("modify",all_labels())],echo = TRUE, eval = TRUE, message=FALSE, warning=FALSE, results = "hide"}
+```{r modify_df, wrapper = TRUE, ref.label = all_labels()[grep("modify",all_labels())],echo = TRUE, eval = FALSE, message=FALSE, warning=FALSE, results = "hide"}
 
 ```
 
@@ -64,7 +85,7 @@ mtcars %>%
 
 # All code chunks are displayed in a single view.
 
-```{r allcode, ref.label = all_labels(),echo = TRUE, eval = FALSE, message=FALSE, warning=FALSE, results = "hide"}
+```{r allcode, wrapper = TRUE, ref.label = all_labels(),echo = TRUE, eval = FALSE, message=FALSE, warning=FALSE, results = "hide"}
 
 ```
 
