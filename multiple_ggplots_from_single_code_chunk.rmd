@@ -1,0 +1,85 @@
+---
+title: How embed dynamically generated multiple ggplots using a single code chunk
+author: |-
+  Shripad Sinari \
+  shripad.sinari@gmail.com 
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    fig_caption: yes
+    keep_tex: yes
+bibliography: ref.bib
+---
+
+# Demo
+
+In this demo we create a small mock report based on the mtcars dataset provided
+in R. The goal is show how generate multiple plots dynamically from a single
+code chunk. 
+
+
+```{r LoadLib, echo = FALSE, eval = TRUE, message=FALSE, warning=FALSE, results = "hide"}
+
+## Live in tidyverse.
+library(tidyverse)
+
+## we need this library to make mtcars a tibble.
+library(dplyr)
+
+## we need this library as it is not part of tidyverse.
+library(knitr) 
+opts_knit$set(eval.after = "fig.cap")
+
+```
+
+```{r modify_data, echo = FALSE, eval = TRUE, message=FALSE, warning=FALSE, results = "hide"}
+## Clear any previous data.
+rm(list = ls())
+
+## data for plotting
+mtcars <- mtcars %>%
+    rownames_to_column("cars") %>%
+    mutate(make = sub("\\s.*", "", cars)
+         , model = sub("^.*\\s", "", cars)) %>%
+    as_tibble()
+
+## Plotting function
+plot <- function(var){
+    p <- mtcars %>%
+        ggplot(aes_string("mpg", var)) +
+        geom_point(aes(shape = factor(gear)), size = 2) +
+        guides(shape = guide_legend(title = "Gear")) +
+        geom_smooth()        
+    return(p)
+}
+
+## Some variables to use for plotting.
+interesting_vars <- c("disp", "hp", "drat", "wt", "qsec")
+caps <- paste("Multiple plots from this chunk. Plotting", interesting_vars,".")
+```
+
+## Multiple Plots (not dynamic) with figure captions
+
+```{r, fig.cap=c("another caption", "and yet an other")}
+qplot(1:5)
+qplot(6:10)
+```
+
+## Multiple plots dynamically
+
+```{r multiple_plots, echo = FALSE, eval = TRUE, message=FALSE, warning=FALSE, fig.pos ="H", fig.path='fig/plot-', dev='png', fig.ext='png', fig.width=12, fig.height=8, dpi = 150, fig.cap = caps}
+
+
+j <- sapply(interesting_vars, function(var)print(plot(var)))
+
+
+```
+
+
+# Reproducibility
+
+```{r ssinfo, echo = FALSE, eval = TRUE, message=FALSE, warning=FALSE, results = "markup"}
+sessionInfo()
+```
+
+# References
