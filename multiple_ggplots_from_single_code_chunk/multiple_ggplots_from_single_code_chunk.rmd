@@ -1,5 +1,5 @@
 ---
-title: How embed dynamically generated multiple ggplots using a single code chunk
+title: How to embed dynamically generated multiple ggplots using a single code chunk
 author: |-
   Shripad Sinari \
   shripad.sinari@gmail.com 

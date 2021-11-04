@@ -1,0 +1,94 @@
+---
+title: "Examples of TikZ plots in html"
+---
+
+# Based on rmarkdown example 
+
+Based in Yihue Xie's [example](https://github.com/yihui/knitr-examples/blob/master/058-engine-tikz.Rmd).
+
+# TikZ graphics
+
+## Description
+
+The engine inserts the code into a latex-string-template, which is then processed by LaTeX (and the **magick** package if `fig.ext` is not `pdf`).
+
+## Options
+
+You can pass some options to the engine by defining `engine.opts`, e.g. use your own template instead of the default one to include the tikz code: `engine.opts = list(template = "mytemplate.tex")`. The default template can be found under `system.file('misc', 'tikz2pdf.tex', package = 'knitr')`.
+
+## Example
+
+An example of the tikz-engine from <https://raw.github.com/sdiehl/cats/master/misc/example.md>
+
+```{tikz, tikz-ex, fig.cap = "Funky tikz", fig.ext = 'png', cache=TRUE}
+\usetikzlibrary{arrows}
+\begin{tikzpicture}[node distance=2cm, auto,>=latex, thick, scale = 0.5]
+\node (P) {$P$};
+\node (B) [right of=P] {$B$};
+\node (A) [below of=P] {$A$};
+\node (C) [below of=B] {$C$};
+\node (P1) [node distance=1.4cm, left of=P, above of=P] {$\hat{P}$};
+\draw[->] (P) to node {$f$} (B);
+\draw[->] (P) to node [swap] {$g$} (A);
+\draw[->] (A) to node [swap] {$f$} (C);
+\draw[->] (B) to node {$g$} (C);
+\draw[->, bend right] (P1) to node [swap] {$\hat{g}$} (A);
+\draw[->, bend left] (P1) to node {$\hat{f}$} (B);
+\draw[->, dashed] (P1) to node {$k$} (P);
+\end{tikzpicture}
+```
+
+```{tikz, tikz-ex2, fig.cap = "Compositional Simplex", fig.ext = 'png', cache=TRUE, engine.opts = list(template = "template.tex")}
+
+\tdplotsetmaincoords{70}{65}
+
+\pgfsetarrowoptions{latex'-latex'new, arrowhead=1cm, line width=2pt}{8pt}
+\begin{tikzpicture}[tdplot_main_coords, scale = 0.4]
+ 
+\def\laxis{12}
+\def\center{4/3}
+\def\ltriangle{4}
+\def\lt{6}
+
+% Draw the axis
+\begin{scope}[->,black]
+\draw (0,0,0) -- (\laxis,0,0) node [below] {\textcolor{black}{$x$}};
+\draw (0,0,0) -- (0,\laxis,0) node [right] {\textcolor{black}{$y$}};
+\draw (0,0,0) -- (0,0,\laxis) node [left] {\textcolor{black}{$z$}};
+\end{scope}
+
+% draw ray through a point
+\draw[solid,color = blue,->] (0,0,0) -- (0.7*8,0.7*12,0.7*8);
+\filldraw [color = purple]    (2*3/2, 3*3/2, 2*3/2) circle (2pt) node [right, style = {scale = 0.8}] {$(2,3,2)$};
+\filldraw [color = purple] (4, 6, 4) circle (2pt) node [right, style = {scale = 0.8}] {$(4,6,4)$};
+\draw[solid,color = red,->] (0,0,0) -- (4,4,12);
+\filldraw [color = black]  (2, 2, 6) circle (2pt) node [right, style = {scale = 0.8}] {$(1,1,3)$};
+\filldraw [color = black] (3, 3, 9) circle (2pt) node [right, style = {scale = 0.8}] {$(3,3,9)$};
+
+% draw the simplex
+\filldraw [opacity=.33,gray] (\lt, 0, 0) -- (0, \lt, 0) -- (0, 0, \lt) -- cycle;
+% draw the intersection of the ray and the simplex
+\filldraw [blue] (\lt*2/7, \lt*3/7, \lt*2/7) circle (1pt) node [right, style={scale=0.5}] {$(\tfrac{2}{7},\tfrac{3}{7},\tfrac{2}{7})$};
+\filldraw [red] (\lt*1/5, \lt*1/5, \lt*3/5) circle (1pt) node [right, style={scale=0.5}] {$(\tfrac{1}{5},\tfrac{1}{5},\tfrac{3}{5})$};
+
+% draw the projection on the x-y plane
+\draw[dashed,color = orange,->] (\lt*2/7, \lt*3/7, \lt*2/7) -- (\lt*2/7, \lt*3/7, 0);
+\filldraw [blue] (\lt*2/7, \lt*3/7, 0) circle (1pt) node [below, style={scale=0.5}] {$(\tfrac{2}{7},\tfrac{3}{7},0)$};
+
+% draw the closure to the face
+\draw[dashed,color = orange,-] (0,0,0) -- (\lt*2/7, \lt*3/7, 0);
+\draw[dashed,color = orange,->]  (\lt*2/7, \lt*3/7, 0) -- (\lt*2/5,\lt*3/5,0);
+\filldraw [blue] (\lt*2/5, \lt*3/5, 0) circle (1pt) node [right, style={scale=0.5}] {$(\tfrac{2}{5},\tfrac{3}{5},0)$};
+
+% identify the vertex
+\filldraw [green] (0,0,\lt) circle (1pt) node [right, style={scale=0.5}] {$(0,0,1)$};
+
+% draw the projection from the vertex
+\draw[densely dashdotted,color = magenta,->] (0,0,\lt) -- (\lt*2/5,\lt*3/5,0);
+
+\end{tikzpicture}
+
+```
+## Tips
+
+To develop the tikz-code, you could use `qtikz` or `ktikz`.

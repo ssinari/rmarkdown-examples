@@ -2,7 +2,7 @@
 title: How to echo all code chunks or specific named ones.
 author: |-
   Shripad Sinari \
-  shripad.sinari@gmail.com \
+  shripad.sinari@gmail.com 
 date: "`r Sys.Date()`"
 output:
   pdf_document:
@@ -89,6 +89,7 @@ mtcars %>%
 
 ```
 
+\clearpage
 
 # Reproducibility
 
